@@ -80,7 +80,7 @@
         Enter the project name to generate the folders.
     </p>
     
-    <input type="text" id="projectName" placeholder="Provide a descriptive name for the project here" />
+    <input type="text" id="projectName" placeholder="Ex.: Class of 2027: Graduation Ceremony" />
     <button id="generateBtn">Create and Download</button>
     <div id="status">Download started successfully!</div>
 </div>
@@ -179,17 +179,17 @@
             statusMsg.style.display = 'block';
 
         } catch (error) {
-            console.error("Erro ao gerar o ZIP:", error);
-            alert("Ocorreu um erro ao gerar a estrutura.");
+            console.error("Error generating ZIP file:", error);
+            alert("An error occurred while generating the structure.");
         } finally {
             // Restaurar botão
             btn.disabled = false;
-            btn.innerText = "Criar e Fazer Download";
+            btn.innerText = "Create and Download";
             
             // Esconder mensagem de sucesso após 3 segundos
             setTimeout(() => {
                 statusMsg.style.display = 'none';
-            }, 3000);
+            }, 8000);
         }
     });
 </script>
