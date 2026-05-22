@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Folder Generator - Post-Production Scaffolding Tool</title>
+    <!-- Importa a biblioteca JSZip -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+        h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #a0c4ff;
+            cursor: not-allowed;
+        }
+        #status {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #28a745;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>
+        Video Folder Generator <br>
+        <small>Post-Production Scaffolding Tool</small>
+    </h2>
+    <p>
+        Enter the project name to generate the folders.
+    </p>
+    
+    <input type="text" id="projectName" placeholder="Provide a descriptive name for the project here" />
+    <button id="generateBtn">Create and Download</button>
+    <div id="status">Download started successfully!</div>
+</div>
+
+<script>
+    document.getElementById('generateBtn').addEventListener('click', async function() {
+        const btn = this;
+        const statusMsg = document.getElementById('status');
+        
+        // Estado de loading
+        btn.disabled = true;
+        btn.innerText = "A gerar arquivo...";
+        statusMsg.style.display = 'none';
+
+        try {
+            // 1. Processar o nome do projeto
+            let inputName = document.getElementById('projectName').value.trim();
+            if (!inputName) {
+                inputName = "novo-projeto";
+            }
+            
+            // Transformação para kebab-case sem acentos
+            const safeProjectName = inputName
+                .normalize('NFD')                     // Separa as letras dos seus acentos (ex: "é" vira "e" + "´")
+                .replace(/[\u0300-\u036f]/g, '')      // Remove as marcas de acentuação do NFD
+                .toLowerCase()                        // Transforma tudo em minúsculas
+                .replace(/[^a-z0-9]+/g, '-')          // Substitui tudo o que não seja letra ou número por um hífen '-'
+                .replace(/^-+|-+$/g, '');             // Remove os hífenes extra no início ou no fim, caso existam
+
+            // 2. Gerar a Data no formato YYYYMMDD
+            const hoje = new Date();
+            const ano = hoje.getFullYear();
+            const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+            const dia = String(hoje.getDate()).padStart(2, '0');
+            const dataFormatada = `${ano}${mes}${dia}`;
+
+            // 3. Nome da pasta raiz
+            const pastaRaiz = `${dataFormatada}-${safeProjectName}`;
+
+            // 4. Instanciar o JSZip e criar a estrutura
+            const zip = new JSZip();
+            const root = zip.folder(pastaRaiz);
+
+            // 01-project-files
+            root.folder("01-project-files/premiere");
+            root.folder("01-project-files/davinci-resolve");
+            root.folder("01-project-files/after-effects");
+
+            // 02-footage
+            root.folder("02-footage/day-01/cam-a");
+            root.folder("02-footage/day-01/cam-b");
+            root.folder("02-footage/b-roll");
+
+            // 03-audio
+            root.folder("03-audio/music");
+            root.folder("03-audio/sfx");
+            root.folder("03-audio/dialogue");
+            root.folder("03-audio/voice-over");
+            root.folder("03-audio/gravador-externo");
+
+            // 04-graphics
+            root.folder("04-graphics/logos");
+            root.folder("04-graphics/typography");
+            root.folder("04-graphics/stills");
+            root.folder("04-graphics/assets/icons");
+            root.folder("04-graphics/assets/emojis");
+
+            // 05-vfx
+            root.folder("05-vfx");
+
+            // 06-exports
+            root.folder("06-exports/wip");
+            root.folder("06-exports/delivery-masters/16x9");
+            root.folder("06-exports/delivery-masters/9x16");
+
+            // 07-documents
+            root.folder("07-documents/scripts-briefing");
+            root.folder("07-documents/contracts");
+
+            // 5. Gerar o ZIP e forçar o download
+            const blob = await zip.generateAsync({ type: "blob" });
+            
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.style.display = "none";
+            a.href = url;
+            a.download = `${pastaRaiz}.zip`;
+            document.body.appendChild(a);
+            a.click();
+            
+            // Limpeza
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+            // Mostrar sucesso
+            statusMsg.style.display = 'block';
+
+        } catch (error) {
+            console.error("Erro ao gerar o ZIP:", error);
+            alert("Ocorreu um erro ao gerar a estrutura.");
+        } finally {
+            // Restaurar botão
+            btn.disabled = false;
+            btn.innerText = "Criar e Fazer Download";
+            
+            // Esconder mensagem de sucesso após 3 segundos
+            setTimeout(() => {
+                statusMsg.style.display = 'none';
+            }, 3000);
+        }
+    });
+</script>
+</body>
+</html>
