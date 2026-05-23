@@ -130,26 +130,27 @@
             root.folder("01-project-files/after-effects");
 
             // 02-footage
-            root.folder("02-footage/day-01/cam-a");
-            root.folder("02-footage/day-01/cam-b");
-            root.folder("02-footage/b-roll");
+            root.folder("02-footage/day-01/card-01-cam-a");
+            root.folder("02-footage/day-01/card-02-cam-b");
+            root.folder("02-footage/stock-media");
+            root.folder("02-footage/archival");
 
             // 03-audio
             root.folder("03-audio/music");
             root.folder("03-audio/sfx");
             root.folder("03-audio/dialogue");
             root.folder("03-audio/voice-over");
-            root.folder("03-audio/gravador-externo");
+            root.folder("03-audio/production-audio");
 
             // 04-graphics
             root.folder("04-graphics/logos");
             root.folder("04-graphics/typography");
             root.folder("04-graphics/stills");
-            root.folder("04-graphics/assets/icons");
-            root.folder("04-graphics/assets/emojis");
+            root.folder("04-graphics/assets");
 
             // 05-vfx
-            root.folder("05-vfx");
+            root.folder("05-vfx/plates");
+            root.folder("05-vfx/renders");
 
             // 06-exports
             root.folder("06-exports/wip");
@@ -159,6 +160,9 @@
             // 07-documents
             root.folder("07-documents/scripts-briefing");
             root.folder("07-documents/contracts");
+
+            // 08-proxies
+            root.folder("08-proxies");
 
             // 5. Gerar o ZIP e forçar o download
             const blob = await zip.generateAsync({ type: "blob" });
